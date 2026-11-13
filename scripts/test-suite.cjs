@@ -98,6 +98,10 @@ assert(fs.existsSync(path.join(__dirname, '../public/robots.txt')), 'public/robo
 assert(fs.existsSync(path.join(__dirname, '../public/sitemap.xml')), 'public/sitemap.xml exists');
 assert(fs.existsSync(path.join(__dirname, '../public/_redirects')), 'public/_redirects exists');
 assert(fs.existsSync(path.join(__dirname, '../public/404.html')), 'public/404.html exists');
+assert(fs.existsSync(path.join(__dirname, '../public/.nojekyll')), 'public/.nojekyll exists');
+assert(fs.existsSync(path.join(__dirname, '../.github/workflows/deploy.yml')), '.github/workflows/deploy.yml exists');
+const viteConfigFile = fs.readFileSync(path.join(__dirname, '../vite.config.ts'), 'utf8');
+assert(viteConfigFile.includes("base: '/website/'"), "vite.config.ts contains base: '/website/'");
 assert(fs.existsSync(path.join(__dirname, '../vercel.json')), 'vercel.json exists');
 
 console.log('\n======================================================');
