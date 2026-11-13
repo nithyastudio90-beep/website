@@ -19,6 +19,7 @@ import { ContactPage } from './pages/ContactPage';
 import { AdminLoginPage } from './pages/AdminLoginPage';
 import { AdminDashboardPage } from './pages/AdminDashboardPage';
 import { NotFoundPage } from './pages/NotFoundPage';
+import { TodosPage } from './pages/TodosPage';
 
 // Scroll to top helper on route change
 function ScrollToTop() {
@@ -66,6 +67,7 @@ function AppLayout() {
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/admin/login" element={<AdminLoginPage />} />
           <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
+          <Route path="/todos" element={<TodosPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </main>
