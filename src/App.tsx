@@ -6,6 +6,7 @@ import { Header } from './components/layout/Header';
 import { Footer } from './components/layout/Footer';
 import { MobileNav } from './components/layout/MobileNav';
 import { FloatingWhatsApp } from './components/layout/FloatingWhatsApp';
+import { AIAssistantWidget } from './components/ai/AIAssistantWidget';
 
 import { HomePage } from './pages/HomePage';
 import { AboutPage } from './pages/AboutPage';
@@ -72,8 +73,13 @@ function AppLayout() {
         </Routes>
       </main>
 
-      {/* Floating WhatsApp button on public pages */}
-      {!isAdminRoute && <FloatingWhatsApp />}
+      {/* Floating WhatsApp and Studio AI Assistant on public pages */}
+      {!isAdminRoute && (
+        <>
+          <AIAssistantWidget />
+          <FloatingWhatsApp />
+        </>
+      )}
 
       {/* Footer on public pages and admin login */}
       {!isAdminDashboard && <Footer />}

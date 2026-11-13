@@ -306,6 +306,50 @@ export const INITIAL_YOUTUBE_VIDEOS: YouTubeVideo[] = [
   }
 ];
 
+export const INITIAL_HOMEPAGE_CONTENT = {
+  id: 'nithya-home-content',
+  hero_headline: 'Capturing Eternal Moments, Crafting Legacies.',
+  hero_subheadline: 'From sacred traditional weddings and romantic pre-wedding stories to 4K cinematic films and heirloom albums. Based in Karapattu, serving Tamil Nadu with artistic devotion.',
+  hero_background_image: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=2000&q=85',
+  hero_cta_primary: 'Explore Our Work',
+  hero_cta_secondary: 'Book Your Session',
+  featured_badge: 'Premier Photography & Cinematography',
+  stats_counters: [
+    { label: 'Years of Heritage', value: '15+' },
+    { label: 'Weddings Captured', value: '500+' },
+    { label: 'Happy Families', value: '1200+' },
+    { label: 'Cinema Quality', value: '4K Ultra' }
+  ],
+};
+
+export const INITIAL_ABOUT_CONTENT = {
+  id: 'nithya-about-content',
+  page_title: 'About Nithya Studio & Video',
+  page_subtitle: 'Honoring heritage, sacred matrimonial rituals, and heartwarming familial celebrations with cinematic artistry in Karapattu, Tamil Nadu.',
+  story_title: 'Preserving Tamil Nadu\'s Auspicious Moments with Dignity and Joy',
+  story_paragraphs: [
+    'Established in Karapattu, Uthangarai Taluk, Nithya Studio & Video was born out of a genuine devotion to the art of visual storytelling. In South Indian weddings, rituals are not merely events—they are sacred transitions brimming with spiritual depth, ancestral blessings, and emotional bonds.',
+    'From the fragrance of fresh jasmine and the rhythmic beats of the thavil to the quiet tears of parents during Kanyadaanam, our lens captures truth without intrusion.',
+    'Over the years, we have grown alongside the families of Karapattu, Uthangarai, and surrounding districts of Tamil Nadu. We treat every assignment with reverence, combining top-tier cinema cameras, drones, and master color grading.'
+  ],
+  experience_years: '15+',
+  weddings_covered: '500+',
+  main_image_url: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=1200&q=80',
+  secondary_image_url: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=1200&q=80'
+};
+
+export const INITIAL_WEBSITE_SECTIONS = {
+  id: 'nithya-sections',
+  show_hero: true,
+  show_about_overview: true,
+  show_services: true,
+  show_portfolio: true,
+  show_youtube: true,
+  show_instagram: true,
+  show_testimonials: true,
+  show_quick_contact: true
+};
+
 export const TESTIMONIALS = [
   {
     id: 'test-1',
@@ -333,5 +377,39 @@ export const TESTIMONIALS = [
     rating: 5,
     comment: 'So patient and gentle with our baby! The photos came out bright, natural, and joyful. The acrylic album we ordered is a treasure on our living room table.',
     date: 'August 2024'
+  }
+];
+
+export const INITIAL_AI_SETTINGS = {
+  id: 'nithya-ai-settings',
+  is_enabled: true,
+  assistant_name: 'Nithya Studio Assistant',
+  system_prompt: 'You are the official AI assistant for Nithya Studio & Video, located in Karapattu Village, Uthangarai Taluk, Tamil Nadu (PIN: 635306). You warmly assist clients with wedding photography, candid video, albums, drone coverage, and studio appointments in Tamil and English.',
+  welcome_message: 'Vanakkam! Welcome to Nithya Studio & Video. How may I assist you with your wedding, photoshoot, or album booking today?',
+  voice_enabled: true,
+  model_name: 'gemini-1.5-flash',
+  gemini_api_key: '',
+  default_language: 'en-IN',
+  max_tokens: 500
+};
+
+export const INITIAL_CUSTOMERS = [
+  {
+    id: 'cust-1',
+    name: 'Karthik & Deepa',
+    normalized_phone: '918489128362',
+    mobile_number: '+91 84891 28362',
+    whatsapp_number: '+91 84891 28362',
+    email: 'karthik@example.com',
+    address: 'Uthangarai, Tamil Nadu',
+    total_bookings: 1,
+    confirmed_bookings: 1,
+    completed_bookings: 1,
+    rejected_bookings: 0,
+    cancelled_bookings: 0,
+    last_booking_date: '2024-02-15',
+    internal_notes: 'VIP Wedding Couple, very happy with handcrafted flush-mount album.',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
   }
 ];

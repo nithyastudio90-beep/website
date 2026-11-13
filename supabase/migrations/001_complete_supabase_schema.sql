@@ -1,0 +1,4 @@
+-- ============================================================================
+-- Migration 001: Complete Supabase Database Schema for Nithya Studio & Video
+-- ============================================================================
+-- See supabase/complete-setup.sql for the complete standalone script.

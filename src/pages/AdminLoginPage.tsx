@@ -1,16 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { ShieldCheck, Lock, Mail, AlertCircle, ArrowLeft, Camera, Check } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { ShieldCheck, Lock, Mail, AlertCircle, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { Button } from '../components/ui/Button';
 
 export const AdminLoginPage: React.FC = () => {
   const navigate = useNavigate();
-  const location = useLocation();
   const { login, isAdmin, isLoading } = useAuth();
 
-  const [email, setEmail] = useState('nithyastudio90@gmail.com');
-  const [password, setPassword] = useState('NithyaStudio@2026');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -24,6 +23,12 @@ export const AdminLoginPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+
+    if (!email.trim() || !password) {
+      setError('Please provide your administrative email and password.');
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -71,49 +76,56 @@ export const AdminLoginPage: React.FC = () => {
               Admin Portal
             </h1>
             <p className="text-xs uppercase tracking-wider text-gold-500 font-semibold mt-1">
-              Nithya Studio & Video Management
+              Nithya Studio & Video CMS
             </p>
           </div>
 
+          {/* Error Banner */}
           {error && (
-            <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-start gap-2.5">
-              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-400" />
+            <div className="p-3.5 rounded-xl bg-red-950/50 border border-red-800/60 text-red-200 text-xs flex items-start gap-2.5">
+              <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
               <p>{error}</p>
             </div>
           )}
 
-          {/* Login Form */}
+          {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs uppercase tracking-wider text-studio-light font-semibold mb-1.5">
-                Staff Email Address
+              <label className="block text-xs uppercase tracking-wider font-semibold text-studio-light mb-1.5">
+                Administrator Email
               </label>
               <div className="relative">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-studio-muted" />
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-studio-muted">
+                  <Mail className="w-4 h-4" />
+                </div>
                 <input
                   type="email"
-                  required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="admin@nithyastudio.in"
-                  className="w-full bg-studio-dark/90 border border-studio-border rounded-xl pl-10 pr-4 py-2.5 text-sm text-studio-light focus:outline-none focus:border-gold-500 focus:ring-2 focus:ring-gold-500"
+                  required
+                  autoComplete="email"
+                  className="w-full bg-studio-charcoal/80 border border-studio-border/70 rounded-xl pl-10 pr-4 py-3 text-sm text-studio-light placeholder:text-studio-muted focus:outline-none focus:border-gold-500 focus:ring-1 focus:ring-gold-500 transition-colors"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs uppercase tracking-wider text-studio-light font-semibold mb-1.5">
+              <label className="block text-xs uppercase tracking-wider font-semibold text-studio-light mb-1.5">
                 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-studio-muted" />
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-studio-muted">
+                  <Lock className="w-4 h-4" />
+                </div>
                 <input
                   type="password"
-                  required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••••••"
-                  className="w-full bg-studio-dark/90 border border-studio-border rounded-xl pl-10 pr-4 py-2.5 text-sm text-studio-light focus:outline-none focus:border-gold-500 focus:ring-2 focus:ring-gold-500"
+                  required
+                  autoComplete="current-password"
+                  className="w-full bg-studio-charcoal/80 border border-studio-border/70 rounded-xl pl-10 pr-4 py-3 text-sm text-studio-light placeholder:text-studio-muted focus:outline-none focus:border-gold-500 focus:ring-1 focus:ring-gold-500 transition-colors"
                 />
               </div>
             </div>
@@ -121,24 +133,19 @@ export const AdminLoginPage: React.FC = () => {
             <Button
               type="submit"
               variant="gold"
-              size="lg"
-              fullWidth
-              disabled={isSubmitting}
-              className="mt-2"
+              className="w-full py-3 mt-2 shadow-gold-glow-sm"
+              disabled={isSubmitting || isLoading}
             >
               {isSubmitting ? 'Authenticating...' : 'Sign In to Dashboard'}
             </Button>
           </form>
 
-          {/* Staff Info Note */}
-          <div className="pt-4 border-t border-studio-border/60 text-center">
-            <p className="text-[11px] text-studio-muted leading-relaxed">
-              Default administrator access credentials configured for official studio management. Only authorized personnel may access customer booking records.
-            </p>
-          </div>
-
         </div>
 
+        {/* Footer Security Note */}
+        <p className="text-center text-[11px] text-studio-muted">
+          Protected by Supabase Authentication & Row Level Security.
+        </p>
       </div>
     </div>
   );

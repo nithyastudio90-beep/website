@@ -15,6 +15,8 @@ export function formatDate(dateString: string): string {
   });
 }
 
+export const formatDisplayDate = formatDate;
+
 export function buildWhatsAppLink(message?: string): string {
   const base = `https://wa.me/${RAW_WHATSAPP_NUMBER}`;
   if (!message) return base;

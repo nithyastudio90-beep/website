@@ -176,10 +176,27 @@ export const Footer: React.FC = () => {
 
         </div>
 
-        {/* Bottom Bar: Copyright & Admin Portal */}
-        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
-          <div className="flex items-center gap-1 text-studio-muted">
+        {/* Bottom Bar: Copyright, Developer Attribution & Admin Portal */}
+        <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs">
+          <div className="flex items-center gap-1 text-studio-muted text-center sm:text-left">
             <span>© {currentYear} {settings.business_name}. All rights reserved.</span>
+          </div>
+
+          {/* Developer Attribution Lead Button */}
+          <div className="flex items-center gap-2">
+            <a
+              href="https://wa.me/919025410200?text=Hello!%20I%20visited%20the%20Nithya%20Studio%20%26%20Video%20website.%20I%20would%20also%20like%20to%20create%20a%20professional%20website%20for%20my%20business.%20Could%20you%20please%20share%20the%20details%3F"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-studio-surface/90 border border-gold-500/30 text-studio-light/90 hover:text-gold-400 hover:border-gold-500/70 hover:bg-gold-500/10 shadow-sm transition-all group"
+              title="Contact Developer via WhatsApp: +91 90254 10200"
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-gold-400 group-hover:scale-125 transition-transform shadow-gold-glow-sm" />
+              <span className="text-[11px] font-medium tracking-wide">
+                Crafted Your Digital Presence
+              </span>
+              <span className="text-[10px] text-gold-400/80 group-hover:translate-x-0.5 transition-transform">↗</span>
+            </a>
           </div>
 
           <div className="flex items-center gap-4">

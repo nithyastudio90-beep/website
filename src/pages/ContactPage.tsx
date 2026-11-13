@@ -1,26 +1,43 @@
 import React, { useState } from 'react';
-import { MapPin, Phone, Mail, MessageSquare, Instagram, Youtube, Clock, Send, CheckCircle2 } from 'lucide-react';
+import { MapPin, Phone, Mail, MessageSquare, Instagram, Youtube, Clock, Send, CheckCircle2, Loader2 } from 'lucide-react';
 import { useStudio } from '../context/StudioContext';
 import { Button } from '../components/ui/Button';
 import { buildWhatsAppLink } from '../lib/utils';
+import { DataService } from '../lib/supabase';
 
 export const ContactPage: React.FC = () => {
   const { settings } = useStudio();
   const [formSent, setFormSent] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [contactData, setContactData] = useState({
     name: '',
     phone: '',
     message: '',
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!contactData.name || !contactData.phone) return;
 
-    // Direct to WhatsApp with contact message
-    const msg = `Hello Nithya Studio & Video,\n\nName: ${contactData.name}\nPhone: ${contactData.phone}\nMessage: ${contactData.message || 'I would like to get in touch.'}`;
-    window.open(buildWhatsAppLink(msg), '_blank');
-    setFormSent(true);
+    setIsSubmitting(true);
+    try {
+      // 1. Save enquiry to Supabase database (or resilient local storage fallback)
+      await DataService.submitEnquiry({
+        customer_name: contactData.name,
+        phone: contactData.phone,
+        message: contactData.message || 'Direct contact request from website.',
+        subject: 'Website Contact Page',
+      });
+
+      // 2. Direct to WhatsApp with contact message for instant notification
+      const msg = `Hello Nithya Studio & Video,\n\nName: ${contactData.name}\nPhone: ${contactData.phone}\nMessage: ${contactData.message || 'I would like to get in touch.'}`;
+      window.open(buildWhatsAppLink(msg), '_blank');
+      setFormSent(true);
+    } catch (err) {
+      console.error('Error submitting enquiry:', err);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const whatsappDirect = buildWhatsAppLink(
@@ -243,9 +260,10 @@ export const ContactPage: React.FC = () => {
                     variant="gold"
                     size="lg"
                     fullWidth
-                    leftIcon={<Send className="w-4 h-4" />}
+                    disabled={isSubmitting}
+                    leftIcon={isSubmitting ? <Loader2 className="w-4 h-4 animate-spin text-studio-black" /> : <Send className="w-4 h-4 text-studio-black" />}
                   >
-                    Send to Studio via WhatsApp
+                    {isSubmitting ? "Sending..." : "Send to Studio via WhatsApp"}
                   </Button>
                 </form>
               )}

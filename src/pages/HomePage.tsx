@@ -7,33 +7,36 @@ import { YouTubeShowcase } from '../components/home/YouTubeShowcase';
 import { InstagramSection } from '../components/home/InstagramSection';
 import { TestimonialsSection } from '../components/home/TestimonialsSection';
 import { QuickContactSection } from '../components/home/QuickContactSection';
+import { useStudio } from '../context/StudioContext';
 
 export const HomePage: React.FC = () => {
+  const { sections } = useStudio();
+
   return (
     <div className="animate-fade-in">
       {/* 1. Hero Section */}
-      <HeroSection />
+      {sections.show_hero !== false && <HeroSection />}
 
       {/* 2. Featured Services */}
-      <FeaturedServices />
+      {sections.show_services !== false && <FeaturedServices />}
 
       {/* 3. About the Studio */}
-      <AboutOverview />
+      {sections.show_about_overview !== false && <AboutOverview />}
 
       {/* 4. Featured Portfolio / Photography Gallery */}
-      <FeaturedPortfolio />
+      {sections.show_portfolio !== false && <FeaturedPortfolio />}
 
       {/* 5. YouTube Video Showcase */}
-      <YouTubeShowcase />
+      {sections.show_youtube !== false && <YouTubeShowcase />}
 
       {/* 6. Instagram Section */}
-      <InstagramSection />
+      {sections.show_instagram !== false && <InstagramSection />}
 
       {/* 7. Customer Testimonials */}
-      <TestimonialsSection />
+      {sections.show_testimonials !== false && <TestimonialsSection />}
 
       {/* 8. Quick Contact Section */}
-      <QuickContactSection />
+      {sections.show_quick_contact !== false && <QuickContactSection />}
     </div>
   );
 };

@@ -3,8 +3,24 @@ import { Star, Quote, MapPin } from 'lucide-react';
 import { SectionHeading } from '../ui/SectionHeading';
 import { Card } from '../ui/Card';
 import { TESTIMONIALS } from '../../lib/constants';
+import { useStudio } from '../../context/StudioContext';
 
 export const TestimonialsSection: React.FC = () => {
+  const { testimonials } = useStudio();
+
+  const publishedReviews = testimonials && testimonials.length > 0
+    ? testimonials.filter(t => t.is_published !== false)
+    : TESTIMONIALS.map(t => ({
+        id: t.id,
+        client_name: t.client_name,
+        event_type: t.event,
+        location: t.location,
+        event_date: t.date,
+        rating: t.rating,
+        comment: t.comment,
+        is_published: true,
+      }));
+
   return (
     <section className="py-20 bg-studio-black relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -16,15 +32,15 @@ export const TestimonialsSection: React.FC = () => {
         />
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {TESTIMONIALS.map((testimonial) => (
+          {publishedReviews.map((testimonial) => (
             <Card
-              key={testimonial.id}
+              key={testimonial.id || testimonial.client_name}
               className="p-8 flex flex-col justify-between bg-studio-card/80 border-studio-border/70 hover:border-gold-500/40 relative"
             >
               <div>
                 {/* Gold Stars */}
                 <div className="flex items-center gap-1 mb-4 text-gold-400">
-                  {[...Array(testimonial.rating)].map((_, i) => (
+                  {[...Array(Math.max(1, Math.min(5, testimonial.rating || 5)))].map((_, i) => (
                     <Star key={i} className="w-4 h-4 fill-gold-400 text-gold-400" />
                   ))}
                 </div>
@@ -44,14 +60,14 @@ export const TestimonialsSection: React.FC = () => {
                   {testimonial.client_name}
                 </h4>
                 <p className="text-xs text-gold-400 font-medium">
-                  {testimonial.event}
+                  {testimonial.event_type}
                 </p>
                 <div className="flex items-center justify-between text-[11px] text-studio-muted mt-1.5">
                   <span className="flex items-center gap-1">
                     <MapPin className="w-3 h-3 text-studio-muted" />
                     {testimonial.location}
                   </span>
-                  <span>{testimonial.date}</span>
+                  <span>{testimonial.event_date}</span>
                 </div>
               </div>
             </Card>

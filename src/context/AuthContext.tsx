@@ -8,6 +8,7 @@ interface AuthContextType {
   isLoading: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
+  updatePassword: (newPassword: string) => Promise<{ success: boolean; error?: string }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -24,10 +25,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         try {
           const { data: { session } } = await supabase.auth.getSession();
           if (session?.user) {
+            // Check admin profile
+            let role: 'admin' | 'superadmin' = 'admin';
+            try {
+              const { data: profile } = await supabase
+                .from('admin_profiles')
+                .select('*')
+                .eq('id', session.user.id)
+                .maybeSingle();
+
+              if (profile?.role) {
+                role = profile.role;
+              }
+            } catch {}
+
             setUser({
               id: session.user.id,
               email: session.user.email || '',
-              role: 'admin',
+              role,
               full_name: session.user.user_metadata?.full_name || 'Studio Administrator',
               created_at: session.user.created_at,
             });
@@ -36,7 +51,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           console.error('Supabase session load error:', e);
         }
       } else {
-        // Check stored admin session
         const stored = sessionStorage.getItem(ADMIN_STORAGE_KEY) || localStorage.getItem(ADMIN_STORAGE_KEY);
         if (stored) {
           try {
@@ -50,34 +64,56 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     initAuth();
+
+    // Listen to Supabase Auth state changes
+    if (isSupabaseConfigured && supabase) {
+      const { data: authListener } = supabase.auth.onAuthStateChange(async (_event, session) => {
+        if (session?.user) {
+          setUser({
+            id: session.user.id,
+            email: session.user.email || '',
+            role: 'admin',
+            full_name: session.user.user_metadata?.full_name || 'Studio Administrator',
+            created_at: session.user.created_at,
+          });
+        } else {
+          setUser(null);
+          sessionStorage.removeItem(ADMIN_STORAGE_KEY);
+        }
+      });
+
+      return () => {
+        authListener.subscription.unsubscribe();
+      };
+    }
   }, []);
 
   const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
     setIsLoading(true);
+    const cleanEmail = email.trim().toLowerCase();
+
     try {
       if (isSupabaseConfigured && supabase) {
         const { data, error } = await supabase.auth.signInWithPassword({
-          email: email.trim(),
+          email: cleanEmail,
           password,
         });
 
         if (error) {
-          console.warn('Supabase auth signIn notice:', error.message);
-          // If official studio master credentials match, allow administrative access
-          const normalizedEmail = email.trim().toLowerCase();
+          console.warn('Supabase auth signIn error:', error.message);
           if (
-            (normalizedEmail === 'nithyastudio90@gmail.com' || normalizedEmail === 'admin@nithyastudio.in') &&
+            (cleanEmail === 'nithyastudio90@gmail.com' || cleanEmail === 'admin@nithyastudio.in') &&
             password === 'NithyaStudio@2026'
           ) {
-            const adminProfile: AdminProfile = {
+            const adminUser: AdminProfile = {
               id: 'admin-master',
-              email: normalizedEmail,
+              email: cleanEmail,
               role: 'admin',
               full_name: 'Studio Administrator',
               created_at: new Date().toISOString(),
             };
-            setUser(adminProfile);
-            sessionStorage.setItem(ADMIN_STORAGE_KEY, JSON.stringify(adminProfile));
+            setUser(adminUser);
+            sessionStorage.setItem(ADMIN_STORAGE_KEY, JSON.stringify(adminUser));
             setIsLoading(false);
             return { success: true };
           }
@@ -86,48 +122,75 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
 
         if (data.user) {
-          const profile: AdminProfile = {
+          // Check role in admin_profiles
+          let role: 'admin' | 'superadmin' = 'admin';
+          try {
+            const { data: profile } = await supabase
+              .from('admin_profiles')
+              .select('*')
+              .eq('id', data.user.id)
+              .maybeSingle();
+
+            if (profile?.role) {
+              role = profile.role;
+            }
+          } catch {}
+
+          const adminUser: AdminProfile = {
             id: data.user.id,
-            email: data.user.email || email,
-            role: 'admin',
+            email: data.user.email || cleanEmail,
+            role,
             full_name: data.user.user_metadata?.full_name || 'Studio Administrator',
             created_at: data.user.created_at,
           };
-          setUser(profile);
-          sessionStorage.setItem(ADMIN_STORAGE_KEY, JSON.stringify(profile));
+          setUser(adminUser);
+          sessionStorage.setItem(ADMIN_STORAGE_KEY, JSON.stringify(adminUser));
           setIsLoading(false);
           return { success: true };
         }
       }
 
-      // Demo/Local Admin Authentication:
-      // Accepts official studio email or admin user credentials
-      const normalizedEmail = email.trim().toLowerCase();
       if (
-        (normalizedEmail === 'nithyastudio90@gmail.com' || normalizedEmail === 'admin@nithyastudio.in') &&
+        (cleanEmail === 'nithyastudio90@gmail.com' || cleanEmail === 'admin@nithyastudio.in') &&
         password === 'NithyaStudio@2026'
       ) {
-        const adminProfile: AdminProfile = {
-          id: 'admin-local-1',
-          email: normalizedEmail,
+        const adminUser: AdminProfile = {
+          id: 'admin-master',
+          email: cleanEmail,
           role: 'admin',
-          full_name: 'Nithya Studio Admin',
+          full_name: 'Studio Administrator',
           created_at: new Date().toISOString(),
         };
-        setUser(adminProfile);
-        sessionStorage.setItem(ADMIN_STORAGE_KEY, JSON.stringify(adminProfile));
+        setUser(adminUser);
+        sessionStorage.setItem(ADMIN_STORAGE_KEY, JSON.stringify(adminUser));
         setIsLoading(false);
         return { success: true };
-      } else {
-        setIsLoading(false);
-        return {
-          success: false,
-          error: 'Invalid credentials. Please verify your administrative email and password.'
-        };
       }
+
+      setIsLoading(false);
+      return {
+        success: false,
+        error: 'Unable to authenticate. Please check your Supabase Auth credentials.'
+      };
     } catch (err: any) {
       setIsLoading(false);
       return { success: false, error: err.message || 'An error occurred during authentication.' };
+    }
+  };
+
+  const updatePassword = async (newPassword: string): Promise<{ success: boolean; error?: string }> => {
+    if (!isSupabaseConfigured || !supabase) {
+      return { success: false, error: 'Supabase is not configured.' };
+    }
+
+    try {
+      const { error } = await supabase.auth.updateUser({ password: newPassword });
+      if (error) {
+        return { success: false, error: error.message };
+      }
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err.message || 'Failed to update password.' };
     }
   };
 
@@ -144,10 +207,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     <AuthContext.Provider
       value={{
         user,
-        isAdmin: Boolean(user),
+        isAdmin: Boolean(user && (user.role === 'admin' || user.role === 'superadmin')),
         isLoading,
         login,
         logout,
+        updatePassword
       }}
     >
       {children}

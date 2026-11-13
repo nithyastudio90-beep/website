@@ -1,11 +1,18 @@
-import React, { useState } from 'react';
-import { Calendar, User, Phone, Mail, MapPin, MessageSquare, Send, AlertCircle, ShieldAlert } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Calendar, User, Phone, Mail, MapPin, MessageSquare, Send, AlertCircle, ShieldAlert, Clock, CheckCircle2 } from 'lucide-react';
 import { useStudio } from '../../context/StudioContext';
 import { DataService } from '../../lib/supabase';
 import { Booking } from '../../types/database.types';
 import { Button } from '../ui/Button';
 import { BookingSuccessModal } from './BookingSuccessModal';
 import { isValidIndianMobile, isValidEmail, buildWhatsAppLink, buildPreFilledBookingMessage } from '../../lib/utils';
+
+const TIME_SLOTS = [
+  { id: 'morning', label: 'Morning Session (06:00 AM – 01:00 PM)', start: '06:00:00', end: '13:00:00', hours: 7 },
+  { id: 'evening', label: 'Evening Session (02:00 PM – 09:00 PM)', start: '14:00:00', end: '21:00:00', hours: 7 },
+  { id: 'fullday', label: 'Full Day Coverage (06:00 AM – 10:00 PM)', start: '06:00:00', end: '22:00:00', hours: 16 },
+  { id: 'custom', label: 'Custom Hours (Specify in notes)', start: '09:00:00', end: '17:00:00', hours: 8 },
+];
 
 interface BookingFormProps {
   defaultService?: string;
@@ -22,6 +29,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({ defaultService, classN
     service_id: '',
     service_name: defaultService || (services[0]?.title ?? 'Wedding Photography'),
     event_date: '',
+    time_slot: 'morning',
     event_location: '',
     additional_message: '',
   });
@@ -30,6 +38,38 @@ export const BookingForm: React.FC<BookingFormProps> = ({ defaultService, classN
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submittedBooking, setSubmittedBooking] = useState<Booking | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
+
+  const [checkingSlot, setCheckingSlot] = useState(false);
+  const [slotAvailable, setSlotAvailable] = useState<boolean | null>(null);
+
+  // Check live availability when date or slot changes
+  useEffect(() => {
+    if (!formData.event_date) {
+      setSlotAvailable(null);
+      return;
+    }
+
+    const selectedSlot = TIME_SLOTS.find((s) => s.id === formData.time_slot) || TIME_SLOTS[0];
+    let isCancelled = false;
+
+    setCheckingSlot(true);
+    DataService.checkSlotAvailability(formData.event_date, selectedSlot.start, selectedSlot.end)
+      .then((isAvail) => {
+        if (!isCancelled) {
+          setSlotAvailable(isAvail);
+          setCheckingSlot(false);
+        }
+      })
+      .catch(() => {
+        if (!isCancelled) {
+          setCheckingSlot(false);
+        }
+      });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [formData.event_date, formData.time_slot]);
 
   // Validate form fields
   const validateForm = () => {
@@ -99,13 +139,18 @@ export const BookingForm: React.FC<BookingFormProps> = ({ defaultService, classN
 
     setIsSubmitting(true);
     try {
-      const result = await DataService.submitBooking({
+      const selectedSlot = TIME_SLOTS.find((s) => s.id === formData.time_slot) || TIME_SLOTS[0];
+
+      const result = await DataService.createBooking({
         customer_name: formData.customer_name,
         mobile_number: formData.mobile_number,
         email: formData.email,
-        service_id: formData.service_id || null,
+        service_id: formData.service_id || undefined,
         service_name: formData.service_name,
         event_date: formData.event_date,
+        event_start_time: selectedSlot.start,
+        event_end_time: selectedSlot.end,
+        duration_hours: selectedSlot.hours,
         event_location: formData.event_location,
         additional_message: formData.additional_message,
       });
@@ -120,6 +165,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({ defaultService, classN
           service_id: '',
           service_name: services[0]?.title ?? 'Wedding Photography',
           event_date: '',
+          time_slot: 'morning',
           event_location: '',
           additional_message: '',
         });
@@ -278,6 +324,62 @@ export const BookingForm: React.FC<BookingFormProps> = ({ defaultService, classN
               <p className="text-rose-400 text-xs mt-1.5">{errors.event_date}</p>
             )}
           </div>
+        </div>
+
+        {/* Time Slot Selection & Live Availability Check */}
+        <div>
+          <label className="block text-xs uppercase tracking-wider text-studio-light font-semibold mb-2">
+            Coverage Time Slot <span className="text-gold-400">*</span>
+          </label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            {TIME_SLOTS.map((slot) => {
+              const isSelected = formData.time_slot === slot.id;
+              return (
+                <button
+                  type="button"
+                  key={slot.id}
+                  onClick={() => setFormData((prev) => ({ ...prev, time_slot: slot.id }))}
+                  className={`p-3 rounded-xl border text-left transition-all flex items-start gap-2.5 ${
+                    isSelected
+                      ? 'bg-gold-500/10 border-gold-500 text-studio-light shadow-gold-glow-sm'
+                      : 'bg-studio-dark/70 border-studio-border/80 text-studio-muted hover:border-gold-500/50 hover:text-studio-light'
+                  }`}
+                >
+                  <Clock className={`w-4 h-4 mt-0.5 shrink-0 ${isSelected ? 'text-gold-400' : 'text-studio-muted'}`} />
+                  <div>
+                    <p className={`text-xs font-semibold ${isSelected ? 'text-gold-400' : 'text-studio-light'}`}>
+                      {slot.label.split(' (')[0]}
+                    </p>
+                    <p className="text-[11px] text-studio-muted">
+                      {slot.label.includes('(') ? slot.label.split('(')[1].replace(')', '') : ''}
+                    </p>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Real-time slot availability indicator */}
+          {formData.event_date && (
+            <div className="mt-3">
+              {checkingSlot ? (
+                <div className="flex items-center gap-2 text-xs text-studio-muted bg-studio-surface/50 border border-studio-border px-3 py-2 rounded-xl">
+                  <div className="w-3 h-3 rounded-full border-2 border-gold-400 border-t-transparent animate-spin" />
+                  <span>Checking date & slot availability...</span>
+                </div>
+              ) : slotAvailable === true ? (
+                <div className="flex items-center gap-2 text-xs text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-3 py-2 rounded-xl">
+                  <CheckCircle2 className="w-4 h-4 shrink-0" />
+                  <span>Selected date and time slot is available for booking!</span>
+                </div>
+              ) : slotAvailable === false ? (
+                <div className="flex items-center gap-2 text-xs text-amber-300 bg-amber-500/10 border border-amber-500/30 px-3 py-2 rounded-xl">
+                  <AlertCircle className="w-4 h-4 shrink-0 text-amber-400" />
+                  <span>Notice: Another event is scheduled around this time. You may still submit; our team will verify specific timings.</span>
+                </div>
+              ) : null}
+            </div>
+          )}
         </div>
 
         {/* Event Location */}

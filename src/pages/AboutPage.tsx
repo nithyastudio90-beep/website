@@ -7,7 +7,7 @@ import { useStudio } from '../context/StudioContext';
 import { buildWhatsAppLink } from '../lib/utils';
 
 export const AboutPage: React.FC = () => {
-  const { settings } = useStudio();
+  const { settings, about } = useStudio();
   const whatsappUrl = buildWhatsAppLink(
     "Hello Nithya Studio & Video, I am reading about your studio and would like to connect."
   );
@@ -22,10 +22,10 @@ export const AboutPage: React.FC = () => {
             Our Legacy & Passion
           </span>
           <h1 className="text-4xl sm:text-5xl font-cinzel font-bold text-studio-light">
-            About Nithya Studio & Video
+            About {settings.business_name || "Nithya Studio & Video"}
           </h1>
           <p className="mt-4 text-sm sm:text-base text-studio-muted max-w-2xl mx-auto">
-            Honoring heritage, sacred matrimonial rituals, and heartwarming familial celebrations with cinematic artistry in Karapattu, Tamil Nadu.
+            {about.page_subtitle || "Honoring heritage, sacred matrimonial rituals, and heartwarming familial celebrations with cinematic artistry in Karapattu, Tamil Nadu."}
           </p>
         </div>
       </div>
@@ -43,22 +43,22 @@ export const AboutPage: React.FC = () => {
             </div>
 
             <h2 className="text-3xl font-cinzel font-bold text-studio-light leading-snug">
-              Preserving Tamil Nadu's Auspicious Moments with Dignity and Joy
+              {about.story_title || "Preserving Tamil Nadu's Auspicious Moments with Dignity and Joy"}
             </h2>
 
             <p className="text-sm sm:text-base text-studio-muted leading-relaxed">
-              Established in <strong>Karapattu, Uthangarai Taluk</strong>, Nithya Studio & Video was born out of a genuine devotion to the art of visual storytelling. In South Indian weddings, rituals are not merely events—they are sacred transitions brimming with spiritual depth, ancestral blessings, and emotional bonds.
+              {about.story_paragraphs?.[0] || "Established in Karapattu, Uthangarai Taluk, Nithya Studio & Video was born out of a genuine devotion to the art of visual storytelling. In South Indian weddings, rituals are not merely events—they are sacred transitions brimming with spiritual depth, ancestral blessings, and emotional bonds."}
             </p>
 
             <p className="text-sm sm:text-base text-studio-muted leading-relaxed">
-              Whether it is the intimate turmeric blessings of the Nalangu, the regal beauty of the Kanchipuram silk saree, or the electric excitement of the bridegroom’s arrival, we stand quietly in the golden light, ensuring no glance or tear is forgotten.
+              {about.story_paragraphs?.[1] || "Whether it is the intimate turmeric blessings of the Nalangu, the regal beauty of the Kanchipuram silk saree, or the electric excitement of the bridegroom’s arrival, we stand quietly in the golden light, ensuring no glance or tear is forgotten."}
             </p>
 
             <div className="p-4 rounded-xl bg-studio-card/80 border border-gold-500/30 flex items-start gap-3">
               <MapPin className="w-5 h-5 text-gold-400 shrink-0 mt-0.5" />
               <div className="text-xs text-studio-light">
                 <span className="font-semibold block text-gold-400 mb-0.5">Physical Studio Location</span>
-                99, Karapattu Village and Post, Uthangarai Taluk, Karapattu, Tamil Nadu – 635306, India.
+                {settings.address_line1}, {settings.address_line2 ? `${settings.address_line2}, ` : ''}{settings.taluk ? `${settings.taluk}, ` : ''}{settings.district_state ? `${settings.district_state} ` : 'Tamil Nadu '}– {settings.pincode}, India.
               </div>
             </div>
           </div>
@@ -66,7 +66,7 @@ export const AboutPage: React.FC = () => {
           <div className="relative">
             <div className="rounded-2xl overflow-hidden border border-gold-500/30 shadow-2xl aspect-[4/3]">
               <img
-                src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=1200&q=85"
+                src={about.main_image_url || "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=1200&q=85"}
                 alt="Nithya Studio & Video Photography"
                 className="w-full h-full object-cover"
               />

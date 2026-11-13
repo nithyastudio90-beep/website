@@ -2,8 +2,11 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { ShieldCheck, Heart, Camera, Award, ArrowRight, MapPin } from 'lucide-react';
 import { Button } from '../ui/Button';
+import { useStudio } from '../../context/StudioContext';
 
 export const AboutOverview: React.FC = () => {
+  const { about, settings } = useStudio();
+
   return (
     <section className="py-20 relative overflow-hidden bg-studio-black">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -13,7 +16,7 @@ export const AboutOverview: React.FC = () => {
           <div className="relative">
             <div className="relative rounded-2xl overflow-hidden border border-gold-500/30 shadow-2xl shadow-gold-500/5 aspect-[4/5] sm:aspect-[4/3] lg:aspect-[4/5]">
               <img
-                src="https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=1200&q=85"
+                src={about.main_image_url || "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=1200&q=85"}
                 alt="South Indian Traditional Wedding Ceremony by Nithya Studio"
                 loading="lazy"
                 className="w-full h-full object-cover"
@@ -25,11 +28,11 @@ export const AboutOverview: React.FC = () => {
             <div className="absolute -bottom-6 -right-4 sm:bottom-6 sm:-right-6 bg-studio-dark/95 backdrop-blur-md border border-gold-500/50 p-5 rounded-2xl shadow-2xl max-w-xs">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-xl bg-gold-500/20 text-gold-400 flex items-center justify-center font-cinzel font-bold text-xl">
-                  ★
+                  {about.experience_years ? `${about.experience_years}` : '15+'}
                 </div>
                 <div>
                   <h4 className="font-cinzel text-sm font-bold text-studio-light">
-                    Heartfelt Dedication
+                    {about.weddings_covered ? `${about.weddings_covered} Weddings` : "Heartfelt Dedication"}
                   </h4>
                   <p className="text-xs text-studio-muted">
                     Honoring Tamil rituals and authentic expressions with cinematic excellence.
@@ -41,7 +44,7 @@ export const AboutOverview: React.FC = () => {
             {/* Location Pill */}
             <div className="absolute top-4 left-4 bg-studio-black/80 backdrop-blur-md border border-studio-border/80 px-3.5 py-1.5 rounded-full flex items-center gap-2 text-xs text-gold-400">
               <MapPin className="w-3.5 h-3.5" />
-              <span>Karapattu, Uthangarai</span>
+              <span>{settings.address_line1 || "Karapattu, Uthangarai"}</span>
             </div>
           </div>
 
@@ -50,20 +53,20 @@ export const AboutOverview: React.FC = () => {
             <div className="inline-flex items-center gap-2">
               <span className="w-8 h-[1px] bg-gold-500/60" />
               <span className="text-xs uppercase tracking-[0.25em] text-gold-400 font-semibold">
-                About Nithya Studio & Video
+                {about.page_title || "About Nithya Studio & Video"}
               </span>
             </div>
 
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-cinzel font-bold text-studio-light leading-tight">
-              Where Ancient Traditions Meet <span className="text-gold-gradient">Modern Cinema</span>
+              {about.story_title || "Where Ancient Traditions Meet Modern Cinema"}
             </h2>
 
             <p className="text-sm sm:text-base text-studio-muted leading-relaxed">
-              Rooted in <strong>Karapattu, Uthangarai Taluk</strong>, Nithya Studio & Video was established to give couples and families in Tamil Nadu an unmatched visual legacy. We understand the sanctity of Tamil nuptial ceremonies — the delicate rhythm of the Nadaswaram, the solemn sanctity of the Kanyadanam, and the euphoric roar of the Mangalyadharanam.
+              {about.story_paragraphs?.[0] || "Rooted in Karapattu, Uthangarai Taluk, Nithya Studio & Video was established to give couples and families in Tamil Nadu an unmatched visual legacy. We understand the sanctity of Tamil nuptial ceremonies — the delicate rhythm of the Nadaswaram, the solemn sanctity of the Kanyadanam, and the euphoric roar of the Mangalyadharanam."}
             </p>
 
             <p className="text-sm sm:text-base text-studio-muted leading-relaxed">
-              Our artists combine cinematic eye, gentle unobtrusive presence, and state-of-the-art 4K gear to preserve unscripted emotions and grand spectacles alike.
+              {about.story_paragraphs?.[1] || "Our artists combine cinematic eye, gentle unobtrusive presence, and state-of-the-art 4K gear to preserve unscripted emotions and grand spectacles alike."}
             </p>
 
             {/* Pillars */}
