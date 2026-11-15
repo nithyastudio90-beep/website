@@ -3,17 +3,18 @@
   "short_name": "Nithya Studio",
   "description": "Premium Wedding Photography & Cinematography",
   "start_url": "/website/",
+  "scope": "/website/",
   "display": "standalone",
   "background_color": "#07080a",
   "theme_color": "#07080a",
   "icons": [
     {
-      "src": "favicon.svg",
+      "src": "/website/favicon.svg",
       "sizes": "any",
       "type": "image/svg+xml"
     },
     {
-      "src": "favicon.ico",
+      "src": "/website/favicon.ico",
       "sizes": "16x16 32x32 48x48",
       "type": "image/x-icon"
     }
